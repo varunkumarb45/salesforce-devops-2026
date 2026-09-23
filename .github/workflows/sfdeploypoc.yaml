@@ -8,6 +8,10 @@ jobs:
     name: "Setup and Deploy to Salesforce Org"
     runs-on: ubuntu-latest
     steps:
+
+      - name: "Checkout Repository"
+        uses: actions/checkout@v7.0.1
+
       - name: "Setup salesforce cli"
         run: npm install --global @salesforce/cli@latest
 
