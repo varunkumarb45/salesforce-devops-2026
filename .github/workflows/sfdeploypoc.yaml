@@ -20,6 +20,6 @@ jobs:
       - name: Authenticate to Salesforce Org
         run: |
           
-          sf org login sfdx-url --sfdx-url-file authFile.json --set-default --target-org --alias dev1 
+          sf org login sfdx-url --sfdx-url-file authFile.json --set-default --alias dev1 
 
       
