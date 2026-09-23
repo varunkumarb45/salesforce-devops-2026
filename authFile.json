@@ -1,0 +1,9 @@
+{
+  "status": 0,
+  "result": {
+    "sfdxAuthUrl": "force://PlatformCLI::5Aep861HWHIww2cF5256WAGvL56W3qT2XN9Aep26Jc7WQqwym8L6qiiMl9VeRa2qh9EssrZMRuWiV7eqyj.wRjk@copadotrial85410663--dev.sandbox.my.salesforce.com"
+  },
+  "warnings": [
+    "This command exposes an SFDX Auth URL. Unlike an access token, this credential contains a refresh token that allows extended access to an org. Avoid sharing or logging this URL. For additional information about org authorization, review https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_url.htm."
+  ]
+}

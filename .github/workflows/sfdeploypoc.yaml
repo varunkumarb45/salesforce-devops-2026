@@ -1,0 +1,25 @@
+name: "Salesforce Deployment POC"
+run-name: "Salesforce Deployment POC"
+on:
+  push:
+
+jobs:
+  setup-and-deploy:
+    name: "Setup and Deploy to Salesforce Org"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Setup salesforce cli"
+        run: npm install --global @salesforce/cli@latest
+
+      - name: "check sf version"
+        run: sf --version
+
+      - name: "Install Salesforce Code Analytics Plugin"
+        run: sf plugins:install code analyser
+
+      - name: Authenticate to Salesforce Org
+        run: |
+          
+          sf org login sfdx-url --sfdx-url-file authFile.json --set-default --target-org --alias dev1 
+
+      
