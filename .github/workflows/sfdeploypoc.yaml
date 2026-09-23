@@ -15,7 +15,7 @@ jobs:
         run: sf --version
 
       - name: "Install Salesforce Code Analytics Plugin"
-        run: echo 'y'| sf plugins:install code analyser
+        run: echo 'y'| sf plugins:install code-analyser
 
       - name: Authenticate to Salesforce Org
         run: |
