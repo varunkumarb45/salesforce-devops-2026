@@ -3,7 +3,29 @@ run-name: "Salesforce Deployment POC"
 on:
   push:
 
+env:
+  ORG_DEFAULT_ALIAS: dev1
+  NODE_VERSION: '>=20.9.0'
+  JAVA_VERSION: '>=11'
+  SF_CLI_VERSION: 'latest'
+
 jobs:
+
+
+  Salesforce-Setup-New-Org:
+    name: "Setup New Salesforce Org"
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: "Checkout Repository"
+        uses: actions/checkout@v7.0.1
+
+      - name: "Print env variables"
+        run: |
+          echo "ORG_DEFAULT_ALIAS: ${{ env.ORG_DEFAULT_ALIAS }}"
+          echo "NODE_VERSION: ${{ env.NODE_VERSION }}"
+          echo "JAVA_VERSION: ${{ env.JAVA_VERSION }}"
+          echo "SF_CLI_VERSION: ${{ env.SF_CLI_VERSION }}"
   setup-and-deploy:
     name: "Setup and Deploy to Salesforce Org"
     runs-on: ubuntu-latest
@@ -16,11 +38,11 @@ jobs:
       - name: Ensure node v20.9.0 or greater
         uses: actions/setup-node@v5
         with:
-          node-version: '>=20.9.0'
+          node-version: '${{ env.NODE_VERSION }}'
       - name: Ensure java v11 or greater
         uses: actions/setup-java@v5
         with:
-          java-version: '>=11'
+          java-version: '${{ env.JAVA_VERSION }}'
           distribution: 'zulu'
       - name: Ensure python v3.10 or greater
         uses: actions/setup-python@v6
@@ -28,7 +50,7 @@ jobs:
           python-version: '>=3.10'
 
       - name: "Setup salesforce cli"
-        run: npm install --global @salesforce/cli@latest
+        run: npm install --global @salesforce/cli@${{ env.SF_CLI_VERSION }}
 
       - name: "check sf version"
         run: sf --version
@@ -63,13 +85,13 @@ jobs:
       - name: Authenticate to Salesforce Org
         run: |
           
-          sf org login sfdx-url --sfdx-url-file authFile.json --set-default --alias dev1 
+          sf org login sfdx-url --sfdx-url-file authFile.json --set-default --alias ${{env.ORG_DEFAULT_ALIAS }}
 
       - name: "Deploy to Salesforce Org"
-        run: sf project deploy start --source-dir force-app/main/default --target-org dev1 --ignore-conflicts
+        run: sf project deploy start --source-dir force-app/main/default --target-org ${{env.ORG_DEFAULT_ALIAS }} --ignore-conflicts
 
       - name: "Assign permission set to user"
-        run: sf org assign permset  --name Onboarding_Manager --on-behalf-of varunb195@gmail.com.dev --target-org dev1
+        run: sf org assign permset  --name Onboarding_Manager --on-behalf-of varunb195@gmail.com.dev --target-org ${{env.ORG_DEFAULT_ALIAS }}
            
 
       
