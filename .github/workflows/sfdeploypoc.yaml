@@ -30,7 +30,7 @@ jobs:
         run: sf project deploy start --source-dir force-app/main/default --target-org dev1 --ignore-conflicts
 
       - name: "Assign permission set to user"
-        run: sf org assign permset assign --name Onboarding_Manager --on-behalf-of varunb195@gmail.com.dev --target-org dev1
+        run: sf org assign permset  --name Onboarding_Manager --on-behalf-of varunb195@gmail.com.dev --target-org dev1
            
 
       
