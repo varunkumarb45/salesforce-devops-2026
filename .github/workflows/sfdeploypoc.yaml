@@ -34,7 +34,15 @@ jobs:
         run: sf --version
 
       - name: "Install Salesforce Code Analytics Plugin"
-        run: echo 'y'| sf plugins:install code-analyzer
+        run: echo 'y'| sf plugins install code-analyzer@latest
+
+      - name: Run Salesforce Code Analyzer
+        id: run-code-analyzer
+        uses: forcedotcom/run-code-analyzer@v2
+        with:
+          run-arguments: --workspace . --view detail --output-file sfca_results.html --output-file sfca_results.json
+          results-artifact-name: salesforce-code-analyzer-results
+          github-token: ${{ github.token }}
 
       - name: Authenticate to Salesforce Org
         run: |
