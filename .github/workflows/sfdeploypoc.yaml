@@ -32,7 +32,7 @@ jobs:
           echo "JAVA_VERSION: ${{ env.JAVA_VERSION }}"
           echo "SF_CLI_VERSION: ${{ env.SF_CLI_VERSION }}"
   setup-and-deploy:
-    name: "Setup and Deploy to Salesforce Org"
+    name: "Setup and Deploy to Salesforce "
     runs-on: ubuntu-latest
     environment: dev
     steps:
