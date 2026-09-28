@@ -61,6 +61,14 @@ jobs:
       - name: "check sf version"
         run: sf --version
 
+      - name: DECRYPT the enc file to key file
+        run: |
+          openssl enc -nosalt -aes-256-cbc -d -in ${{ secrets.ENCRYPTION_KEY_FILE }} -out ${{ secrets.JWT_KEY_FILE }} -base64 -K ${{ secrets.DECRYPTION_KEY  }}  -iv ${{ secrets.DECRYPTION_IV }}
+
+      - name: Authenticate to Salesforce Org using jwt key file
+        run: |
+          sf org login jwt --client-id ${{ secrets.CONSUMER_KEY }} --jwt-key-file ${{ secrets.JWT_KEY_FILE }} --username ${{ secrets.DEPLOYMENT_USER_USERNAME }} --set-default --alias ${{env.ORG_DEFAULT_ALIAS }}
+
       - name: "Install Salesforce Code Analytics Plugin"
         run: echo 'y'| sf plugins install code-analyzer@latest
 
@@ -88,13 +96,7 @@ jobs:
           steps.run-code-analyzer.outputs.num-sev2-violations-in-changed-files > 0
         run: exit 0
 
-      - name: DECRYPT the enc file to key file
-        run: |
-          openssl enc -nosalt -aes-256-cbc -d -in ${{ secrets.ENCRYPTION_KEY_FILE }} -out ${{ secrets.JWT_KEY_FILE }} -base64 -K ${{ secrets.DECRYPTION_KEY  }}  -iv ${{ secrets.DECRYPTION_IV }}
-
-      - name: Authenticate to Salesforce Org using jwt key file
-        run: |
-          sf org login jwt --client-id ${{ secrets.CONSUMER_KEY }} --jwt-key-file ${{ secrets.JWT_KEY_FILE }} --username ${{ secrets.DEPLOYMENT_USER_USERNAME }} --set-default --alias ${{env.ORG_DEFAULT_ALIAS }}
+      
           
           
 
