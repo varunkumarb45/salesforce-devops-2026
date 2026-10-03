@@ -5,8 +5,7 @@ on:
   push:
     paths:
       - 'force-app/**'
-    branches:
-      - abc_feature/**
+    
 
 env:
   ORG_DEFAULT_ALIAS: PROD_ORG
