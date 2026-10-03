@@ -1,0 +1,115 @@
+name: "Salesforce Deployment POC"
+run-name: "Salesforce Deployment POC1"
+on:
+  push:
+   paths:
+     - 'force-app/**'
+     - '.github/workflows/sfdeploypoc.yaml'
+
+env:
+  ORG_DEFAULT_ALIAS: dev1
+  NODE_VERSION: '>=20.9.0'
+  JAVA_VERSION: '>=11'
+  SF_CLI_VERSION: 'latest'
+
+jobs:
+
+
+  Salesforce-Setup-New-Org:
+    name: "Setup New Salesforce Org"
+    runs-on: ubuntu-latest
+    environment: dev
+      
+    steps:
+
+      - name: "Checkout Repository"
+        uses: actions/checkout@v7.0.1
+
+      - name: "Print env variables"
+        run: |
+          echo "ORG_DEFAULT_ALIAS: ${{ env.ORG_DEFAULT_ALIAS }}"
+          echo "NODE_VERSION: ${{ env.NODE_VERSION }}"
+          echo "JAVA_VERSION: ${{ env.JAVA_VERSION }}"
+          echo "SF_CLI_VERSION: ${{ env.SF_CLI_VERSION }}"
+  setup-and-deploy:
+    name: "Setup and Deploy to Salesforce "
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+
+      - name: "Checkout Repository"
+        uses: actions/checkout@v7.0.1
+
+      # PREREQUISITES - Only needed if the runner doesn't already satisfy these requirements.
+      - name: Ensure node v20.9.0 or greater
+        uses: actions/setup-node@v5
+        with:
+          node-version: '${{ env.NODE_VERSION }}'
+      - name: Ensure java v11 or greater
+        uses: actions/setup-java@v5
+        with:
+          java-version: '${{ env.JAVA_VERSION }}'
+          distribution: 'zulu'
+      - name: Ensure python v3.10 or greater
+        uses: actions/setup-python@v6
+        with:
+          python-version: '>=3.10'
+
+      - name: "Setup salesforce cli"
+        run: npm install --global @salesforce/cli@${{ env.SF_CLI_VERSION }}
+
+      - name: "check sf version"
+        run: sf --version
+
+      - name: DECRYPT the enc file to key file
+        run: |
+          openssl enc -nosalt -aes-256-cbc -d -in ${{ secrets.ENCRYPTION_KEY_FILE }} -out ${{ secrets.JWT_KEY_FILE }} -base64 -K ${{ secrets.DECRYPTION_KEY  }}  -iv ${{ secrets.DECRYPTION_IV }}
+
+      - name: Authenticate to Salesforce Org using jwt key file
+        run: |
+          sf org login jwt --client-id ${{ secrets.CONSUMER_KEY }} --jwt-key-file ${{ secrets.JWT_KEY_FILE }} --username ${{ secrets.DEPLOYMENT_USER_USERNAME }} --set-default --alias ${{env.ORG_DEFAULT_ALIAS }}
+
+      - name: "Install Salesforce Code Analytics Plugin"
+        run: echo 'y'| sf plugins install code-analyzer@latest
+
+      - name: Run Salesforce Code Analyzer
+        id: run-code-analyzer
+        uses: forcedotcom/run-code-analyzer@v2
+        with:
+          run-arguments: --workspace . --view detail --output-file sfca_results.html --output-file sfca_results.json
+          results-artifact-name: salesforce-code-analyzer-results
+          github-token: ${{ github.token }}
+
+      # Option 1: Quality gate on ALL files in the repository
+      - name: Fail on Critical/High Violations (All Files)
+        if: |
+          steps.run-code-analyzer.outputs.exit-code > 0 ||
+          steps.run-code-analyzer.outputs.num-sev1-violations > 0 ||
+          steps.run-code-analyzer.outputs.num-sev2-violations > 0 ||
+          steps.run-code-analyzer.outputs.num-violations > 10
+        run: exit 0
+
+      # Option 2: Quality gate on CHANGED files only (useful for legacy codebases)
+      - name: Fail on Critical/High Violations (Changed Files Only)
+        if: |
+          steps.run-code-analyzer.outputs.num-sev1-violations-in-changed-files > 0 ||
+          steps.run-code-analyzer.outputs.num-sev2-violations-in-changed-files > 0
+        run: exit 0
+
+      
+          
+          
+
+      #- name: Authenticate to Salesforce Org
+      #  run: |
+          
+      #    sf org login sfdx-url --sfdx-url-file authFile.json --set-default --alias ${{env.ORG_DEFAULT_ALIAS }}
+
+      - name: "Deploy to Salesforce Org"
+        run: sf project deploy start --source-dir force-app/main/default --target-org ${{env.ORG_DEFAULT_ALIAS }} --ignore-conflicts
+
+      - name: "Assign permission set to user"
+        run: sf org assign permset  --name Onboarding_Manager --on-behalf-of varunb195@gmail.com.dev --target-org ${{env.ORG_DEFAULT_ALIAS }}
+           
+
+      
