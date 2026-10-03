@@ -121,10 +121,10 @@ jobs:
           
       #    sf org login sfdx-url --sfdx-url-file authFile.json --set-default --alias ${{env.ORG_DEFAULT_ALIAS }}
 
-      - name: "Deploy to Salesforce Org"
-        run: sf project deploy start --source-dir force-app/main/default --target-org ${{env.ORG_DEFAULT_ALIAS }} --ignore-conflicts
+      #- name: "Deploy to Salesforce Org"
+      #  run: sf project deploy start --source-dir force-app/main/default --target-org ${{env.ORG_DEFAULT_ALIAS }} --ignore-conflicts
 
-      - name: "Assign permission set to user"
-        run: sf org assign permset  --name Onboarding_Manager --on-behalf-of varunb195@gmail.com.dev --target-org ${{env.ORG_DEFAULT_ALIAS }}
+      #- name: "Assign permission set to user"
+      #  run: sf org assign permset  --name Onboarding_Manager --on-behalf-of varunb195@gmail.com.dev --target-org ${{env.ORG_DEFAULT_ALIAS }}
 
       
