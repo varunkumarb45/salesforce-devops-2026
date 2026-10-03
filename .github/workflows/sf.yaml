@@ -2,7 +2,7 @@ name: "Salesforce Pipeline"
 run-name: "Salesforce Pipeline Run"
 
 on:
-  push:
+  pull_request:
     paths:
       - 'force-app/**'
     branches:

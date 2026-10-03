@@ -1,7 +1,10 @@
 name: "Salesforce Deployment POC"
 run-name: "Salesforce Deployment POC1"
 on:
-  push:
+  pull_request:
+    paths:
+      - 'force-app/**'
+      - '.github/workflows/sfdeploypoc.yaml'
    paths:
      - 'force-app/**'
      - '.github/workflows/sfdeploypoc.yaml'
