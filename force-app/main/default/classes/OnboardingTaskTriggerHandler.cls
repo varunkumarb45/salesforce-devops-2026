@@ -1,6 +1,6 @@
 /**
  * @description Trigger handler for Onboarding_Task__c.
- *              Follows the "one trigger per object, handler class" pattern.
+ *              Follows the "one trigger per object, handler class" pattern test.
  *              Delegates all logic to OnboardingService.
  */
 public with sharing class OnboardingTaskTriggerHandler {

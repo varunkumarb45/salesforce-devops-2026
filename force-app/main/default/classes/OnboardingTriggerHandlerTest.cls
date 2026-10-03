@@ -1,6 +1,6 @@
 /**
  * @description Tests for OnboardingRequestTriggerHandler and
- *              OnboardingTaskTriggerHandler, exercised through DML operations.
+ *              OnboardingTaskTriggerHandler, exercised through DML operations test.
  */
 @IsTest
 private class OnboardingTriggerHandlerTest {
