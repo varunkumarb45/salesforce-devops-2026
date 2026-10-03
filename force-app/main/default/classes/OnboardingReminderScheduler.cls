@@ -1,7 +1,7 @@
 /**
  * @description Scheduled Apex class that runs daily at 8 AM.
  *              Enqueues OnboardingReminderBatch to find Onboarding Requests
- *              starting in 3 days with incomplete tasks and send reminder emails.
+ *              starting in 3 days with incomplete tasks and send reminder emails test.
  *
  *              Using a batch class (instead of calling the service directly) ensures
  *              the email governor limit is not breached when large numbers of requests
