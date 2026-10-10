@@ -8,6 +8,7 @@ package.xml
 **/jsconfig.json
 **/.eslintrc.json
 force-app/main/default/namedCredentials/PantherSchools.namedCredential-meta.xml
+adding comments
 
 # LWC Jest
 **/__tests__/**
