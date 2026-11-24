@@ -15,5 +15,15 @@ jobs:
 
       - name: Info
         run: echo "this is my second step"
-   
+
+  Deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print
+        run: echo "This is my first pipeline"
+
+      - name: Info
+        run: echo "this is my second step" 
   
