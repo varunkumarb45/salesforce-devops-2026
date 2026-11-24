@@ -1,29 +1,38 @@
-name: CI Pipeline
-run-name: "CI pipeline is running"
+name: Salesforce CI Pipeline
+run-name: "Salesforce Pipeline"
 
-on:  
-  push: 
+on:
+  push:
+   
+Jobs:
+  build-and-test:
+   name: Salesforce Build and Test
+   runs-on: ubuntu-latest
 
-jobs:
-  build-and-validate:
-    name: Build & Validate
-    runs-on: ubuntu-latest
+   steps:
+     - name: Checkout Repository
+       uses: actions/checkout@v3
+       with:
+        fetch-depth: 0
+  
+      - name: Set up Salesforce CLI
+        run: npm install --global @salesforce/cli@latest
+  
+      - name: Check Salesforce CLI Version
+        run: sf --version
 
-    steps:
-      - name: Print
-        run: echo "This is my first pipeline"
+      - name: Install Salesforce code-analysis plugin
+        run: sf plugins install code-analyzer
 
-      - name: Info
-        run: echo "this is my second step"
+      - name: Authenticate with Salesforce Org
+        run: sf org login sfdx-url --sfdx-url-file authFile.json --set-default --alias Dev1New
 
-  Deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
+      
+       
 
-    steps:
-      - name: Print
-        run: echo "This is my first pipeline"
+       
 
-      - name: Info
-        run: echo "this is my second step" 
+
+
+  
   
