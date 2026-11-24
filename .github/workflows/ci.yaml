@@ -15,17 +15,17 @@ Jobs:
        with:
         fetch-depth: 0
   
-      - name: Set up Salesforce CLI
-        run: npm install --global @salesforce/cli@latest
+     - name: Set up Salesforce CLI
+       run: npm install --global @salesforce/cli@latest
   
-      - name: Check Salesforce CLI Version
-        run: sf --version
+     - name: Check Salesforce CLI Version
+       run: sf --version
 
-      - name: Install Salesforce code-analysis plugin
-        run: sf plugins install code-analyzer
+     - name: Install Salesforce code-analysis plugin
+       run: sf plugins install code-analyzer
 
-      - name: Authenticate with Salesforce Org
-        run: sf org login sfdx-url --sfdx-url-file authFile.json --set-default --alias Dev1New
+     - name: Authenticate with Salesforce Org
+       run: sf org login sfdx-url --sfdx-url-file authFile.json --set-default --alias Dev1New
 
       
        
