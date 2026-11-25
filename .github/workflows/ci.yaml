@@ -53,7 +53,7 @@ jobs:
         run: sf --version
 
       - name: Ensure node v20.9.0 or greater
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: '>=20.9.0'
 
