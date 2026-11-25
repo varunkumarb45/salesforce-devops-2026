@@ -37,14 +37,15 @@ jobs:
 
       - name: Print all the Env variables 
         run: echo ${{env.ORG_AlIAS}} ${{env.NODE_VERSION}} ${{env.JAVA_VERSION}} ${{env.SF_CLI_VERSION}} ${{env.ORG_VARIABLE}} ${{env.WAIT_TIME}} ${{env.TEST_LEVEL}}
-
-      - name: Print all the Env variables2
-        run: echo ${{toJSON(env)}}
-
+      
       - name: Print all the Env variables3
         run: |
           echo $ORG_ALIAS
 
+      - name: Print all the Env variables2
+        run: echo ${{toJSON(env)}}
+
+     
       
       - name: Set up Salesforce CLI
         run: npm install --global @salesforce/cli@latest
