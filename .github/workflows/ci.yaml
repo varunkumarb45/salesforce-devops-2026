@@ -4,6 +4,15 @@ run-name: "Salesforce Pipeline"
 on:
   push:
 
+env:
+  ORG_ALIAS: Dev1New
+  NODE_VERSION: ">=20.9.0"
+  JAVA_VERSION: ">=11"
+  SF_CLI_VERSION: latest
+  ORG_VARIABLE: ${{ vars.ORGANIZATION_VARIABLE }}
+  WAIT_TIME: 30
+  TEST_LEVEL: RunLocalTests
+
 jobs:
   build-and-test:
     name: Salesforce Build and Test
@@ -26,6 +35,17 @@ jobs:
           echo ${{github.workflow}}
           echo ${{github.run_id}}
 
+      - name: Print all the Env variables 
+        run: echo ${{env.ORG_AlIAS}} ${{env.NODE_VERSION}} ${{env.JAVA_VERSION}} ${{env.SF_CLI_VERSION}} ${{env.ORG_VARIABLE}} ${{env.WAIT_TIME}} ${{env.TEST_LEVEL}}
+
+      - name: Print all the Env variables2
+        run: echo ${{toJSON(env)}}
+
+      - name: Print all the Env variables3
+        run: |
+          echo $ORG_ALIAS
+
+      
       - name: Set up Salesforce CLI
         run: npm install --global @salesforce/cli@latest
 
