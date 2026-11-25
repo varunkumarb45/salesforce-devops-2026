@@ -21,8 +21,47 @@ jobs:
       - name: Check Salesforce CLI Version
         run: sf --version
 
-      - name: Install Salesforce Code Analyzer
-        run: sf plugins install code-analyzer
+      - name: Ensure node v20.9.0 or greater
+        uses: actions/setup-node@v5
+        with:
+          node-version: '>=20.9.0'
+
+      - name: Ensure java v11 or greater
+        uses: actions/setup-java@v5
+        with:
+          java-version: '>=11'
+          distribution: 'zulu'
+
+      - name: Ensure python v3.10 or greater
+        uses: actions/setup-python@v6
+        with:
+          python-version: '>=3.10'
+
+      - name: Install Latest Salesforce Code Analyzer CLI Plugin
+        run: sf plugins install code-analyzer@latest
+
+      - name: Run Salesforce Code Analyzer
+        id: run-code-analyzer
+        uses: forcedotcom/run-code-analyzer@v2
+        with:
+          run-arguments: --workspace . --view detail --output-file sfca_results.html --output-file sfca_results.json
+          results-artifact-name: salesforce-code-analyzer-results
+          github-token: ${{ github.token }}
+
+      # Option 1: Quality gate on ALL files in the repository
+      - name: Fail on Critical/High Violations (All Files)
+        if: |
+          steps.run-code-analyzer.outputs.exit-code > 0 ||
+          steps.run-code-analyzer.outputs.num-sev1-violations > 0 ||
+          steps.run-code-analyzer.outputs.num-sev2-violations > 0 ||
+          steps.run-code-analyzer.outputs.num-violations > 10
+        run: exit 1
 
       - name: Authenticate with Salesforce Org
         run: sf org login sfdx-url --sfdx-url-file authFile.json --set-default --alias Dev1New
+
+      - name: Deploy to Salesforce Org
+        run: sf project deploy start --target-org Dev1New --source-dir force-app 
+
+      - name: Assign permissionset
+        run: sf org assign permset --name Onboarding Manager --on-behalf-of bvarunkumar088@gmail.com.dev1 --target-org Dev1New
