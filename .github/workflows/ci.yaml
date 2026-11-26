@@ -1,19 +1,116 @@
-name: CI Pipeline
-run-name: "CI pipeline is running"
+name: Salesforce CI Pipeline
+run-name: "Salesforce Pipeline"
 
-on:  
-  push: 
+on:
+  push:
+    paths:
+      - 'force-app/**'
+    branches:
+      - uat
+      - feature/**
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'force-app/**'
+    branches:
+      - uat
+      
+
+env:
+  ORG_ALIAS: Dev1New
+  NODE_VERSION: ">=20.9.0"
+  JAVA_VERSION: ">=11"
+  SF_CLI_VERSION: latest
+  ORG_VARIABLE: ${{ vars.ORGANIZATION_VARIABLE }}
+  WAIT_TIME: 30
+  TEST_LEVEL: RunLocalTests
 
 jobs:
-  build-and-validate:
-    name: Build & Validate
+  build-and-test:
+    name: Salesforce Build and Test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print
-        run: echo "This is my first pipeline"
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Info
-        run: echo "this is my second step"
-   
-  
+      - name: Print Github Context
+        run: |
+          echo "GitHub Context:"
+          echo ${{github.repository}} 
+          echo ${{github.ref}}
+          echo ${{github.actor}}
+          echo ${{github.event_name}}
+          echo ${{github.sha}}
+          echo ${{github.workflow}}
+          echo ${{github.run_id}}
+
+      - name: Print all the Env variables 
+        run: echo ${{env.ORG_AlIAS}} ${{env.NODE_VERSION}} ${{env.JAVA_VERSION}} ${{env.SF_CLI_VERSION}} ${{env.ORG_VARIABLE}} ${{env.WAIT_TIME}} ${{env.TEST_LEVEL}}
+      
+      - name: Print all the Env variables3
+        run: |
+          echo $ORG_ALIAS
+
+      - name: Set up Salesforce CLI
+        run: npm install --global @salesforce/cli@latest
+
+      - name: Check Salesforce CLI Version
+        run: sf --version
+
+      - name: Ensure node v20.9.0 or greater
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '>=20.9.0'
+
+      - name: Ensure java v11 or greater
+        uses: actions/setup-java@v5
+        with:
+          java-version: '>=11'
+          distribution: 'zulu'
+
+      - name: Ensure python v3.10 or greater
+        uses: actions/setup-python@v6
+        with:
+          python-version: '>=3.10'
+
+      - name: Authenticate with Salesforce Org
+        env:
+          DEVSB_AUTH_URL: ${{ secrets.DEVSB_AUTH_URL }}
+          
+
+        run: |
+          echo "Authenticating with Salesforce Org..."
+          echo $DEVSB_AUTH_URL > authFile.txt
+          sf org login sfdx-url --sfdx-url-file authFile.txt --set-default --alias Dev1New
+            
+
+      - name: Install Latest Salesforce Code Analyzer CLI Plugin
+        run: sf plugins install code-analyzer@latest
+
+      - name: Run Salesforce Code Analyzer
+        id: run-code-analyzer
+        uses: forcedotcom/run-code-analyzer@v2
+        with:
+          run-arguments: --workspace . --view detail --output-file sfca_results.html --output-file sfca_results.json
+          results-artifact-name: salesforce-code-analyzer-results
+          github-token: ${{ github.token }}
+
+      # Option 1: Quality gate on ALL files in the repository
+      - name: Fail on Critical/High Violations (All Files)
+        if: |
+          steps.run-code-analyzer.outputs.exit-code > 0 ||
+          steps.run-code-analyzer.outputs.num-sev1-violations > 0 ||
+          steps.run-code-analyzer.outputs.num-sev2-violations > 0 ||
+          steps.run-code-analyzer.outputs.num-violations > 10
+        run: exit 0
+
+      
+
+      - name: Deploy to Salesforce Org
+        run: sf project deploy start --target-org Dev1New --source-dir force-app 
+
+      #- name: Assign permissionset
+      #  run: sf org assign permset --name Onboarding Manager --on-behalf-of bvarunkumar088@gmail.com.dev1 --target-org Dev1New
