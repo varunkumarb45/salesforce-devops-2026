@@ -69,6 +69,17 @@ jobs:
         with:
           python-version: '>=3.10'
 
+      - name: Authenticate with Salesforce Org
+        env:
+          DEVSB_AUTH_URL: ${{ secrets.DEVSB_AUTH_URL }}
+          SFDX_AUTH_FILE_PATH: ${{ secrets.SFDX_AUTH_FILE_PATH }}
+
+        run: 
+          echo "Authenticating with Salesforce Org..."
+          echo $DEVSB_AUTH_URL > ${{env.SFDX_AUTH_FILE_PATH}}
+          sf org login sfdx-url --sfdx-url-file ${{ env.SFDX_AUTH_FILE_PATH }} --set-default --alias Dev1New
+            
+
       - name: Install Latest Salesforce Code Analyzer CLI Plugin
         run: sf plugins install code-analyzer@latest
 
@@ -89,8 +100,7 @@ jobs:
           steps.run-code-analyzer.outputs.num-violations > 10
         run: exit 1
 
-      - name: Authenticate with Salesforce Org
-        run: sf org login sfdx-url --sfdx-url-file authFile.json --set-default --alias Dev1New
+      
 
       - name: Deploy to Salesforce Org
         run: sf project deploy start --target-org Dev1New --source-dir force-app 
