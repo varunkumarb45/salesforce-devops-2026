@@ -3,6 +3,18 @@ run-name: "Salesforce Pipeline"
 
 on:
   push:
+    paths:
+      - 'force-app/**'
+    branches:
+      - uat
+      - feature/**
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'force-app/**'
+    branches:
+      - uat
+      
 
 env:
   ORG_ALIAS: Dev1New
