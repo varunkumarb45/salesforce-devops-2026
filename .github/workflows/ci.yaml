@@ -67,12 +67,12 @@ jobs:
       - name: Authenticate with Salesforce Org
         env:
           DEVSB_AUTH_URL: ${{ secrets.DEVSB_AUTH_URL }}
-          SFDX_AUTH_FILE_PATH: ${{ secrets.SFDX_AUTH_FILE_PATH }}
+          
 
         run: 
           echo "Authenticating with Salesforce Org..."
-          echo $DEVSB_AUTH_URL > ${{env.SFDX_AUTH_FILE_PATH}}
-          sf org login sfdx-url --sfdx-url-file ${{ env.SFDX_AUTH_FILE_PATH }} --set-default --alias Dev1New
+          echo $DEVSB_AUTH_URL > AuthFile.json
+          sf org login sfdx-url --sfdx-url-file AuthFile.json --set-default --alias Dev1New
             
 
       - name: Install Latest Salesforce Code Analyzer CLI Plugin
