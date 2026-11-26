@@ -42,11 +42,6 @@ jobs:
         run: |
           echo $ORG_ALIAS
 
-      - name: Print all the Env variables2
-        run: echo ${{toJSON(env)}}
-
-     
-      
       - name: Set up Salesforce CLI
         run: npm install --global @salesforce/cli@latest
 
