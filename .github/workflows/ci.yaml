@@ -69,7 +69,7 @@ jobs:
           DEVSB_AUTH_URL: ${{ secrets.DEVSB_AUTH_URL }}
           
 
-        run: 
+        run: |
           echo "Authenticating with Salesforce Org..."
           echo $DEVSB_AUTH_URL > AuthFile.json
           sf org login sfdx-url --sfdx-url-file AuthFile.json --set-default --alias Dev1New
