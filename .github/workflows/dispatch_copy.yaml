@@ -49,7 +49,7 @@ on:
 
 jobs:
   print-inputs:
-    runs-on: ${{ github.event.inputs.runner }}   # 👈 used here
+    runs-on: ${{ github.event.inputs.runner }}   # 👈 used here.
     steps:
       - name: Print all inputs
         run: |
