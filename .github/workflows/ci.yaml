@@ -3,8 +3,7 @@ run-name: "Salesforce Pipeline"
 
 on:
   push:
-    paths:
-      - 'force-app/**'
+    
     branches:
       - uat
       - feature/**
@@ -75,15 +74,29 @@ jobs:
         with:
           python-version: '>=3.10'
 
-      - name: Authenticate with Salesforce Org
-        env:
-          DEVSB_AUTH_URL: ${{ secrets.DEVSB_AUTH_URL }}
+      - name: "Decrypt the Encrypted File"
+        run:
+          openssl enc -nosalt -aes-256-cbc -d -in ${{ secrets.ENCRYPTION_KEY_FILE }} -out ${{ secrets.JWT_KEY_FILE }} -base64 -K ${{ secrets.DECRYPTION_KEY }} -iv ${{ secrets.DECRYPTION_IV }}
+
+      - name: "Authenticate with Salesforce"
+        run: |
+          sf org login jwt --client-id ${{ secrets.CONSUMER_KEY }} \
+            --jwt-key-file ${{ secrets.JWT_KEY_FILE }} \
+            --username ${{ secrets.DEPLOYMENT_USER_USERNAME }} \
+            --set-default --alias ${{ vars.ORG_DEFAULT_ALIAS }} \
+            --instance-url ${{ vars.HUB_LOGIN_URL }}
+
+      
+
+      #- name: Authenticate with Salesforce Org
+      #  env:
+      #    DEVSB_AUTH_URL: ${{ secrets.DEVSB_AUTH_URL }}
           
 
-        run: |
-          echo "Authenticating with Salesforce Org..."
-          echo $DEVSB_AUTH_URL > authFile.txt
-          sf org login sfdx-url --sfdx-url-file authFile.txt --set-default --alias Dev1New
+      #  run: |
+      #    echo "Authenticating with Salesforce Org..."
+      #    echo $DEVSB_AUTH_URL > authFile.txt
+      #    sf org login sfdx-url --sfdx-url-file authFile.txt --set-default --alias Dev1New
             
 
       - name: Install Latest Salesforce Code Analyzer CLI Plugin
