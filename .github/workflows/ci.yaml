@@ -27,6 +27,7 @@ jobs:
   build-and-test:
     name: Salesforce Build and Test
     runs-on: ubuntu-latest
+    environment: Dev
 
     steps:
       - name: Checkout Repository
@@ -75,16 +76,23 @@ jobs:
           python-version: '>=3.10'
 
       - name: "Decrypt the Encrypted File"
-        run:
-          openssl enc -nosalt -aes-256-cbc -d -in ${{ secrets.ENCRYPTION_KEY_FILE }} -out ${{ secrets.JWT_KEY_FILE }} -base64 -K ${{ secrets.DECRYPTION_KEY }} -iv ${{ secrets.DECRYPTION_IV }}
+        run: |
+          if [[ '${{ secrets.ENCRYPTION_KEY_FILE == '' || secrets.JWT_KEY_FILE == '' || secrets.DECRYPTION_KEY == '' || secrets.DECRYPTION_IV == '' }}' == true ]]; then
+            echo '::error::Check availability of ENCRYPTION_KEY_FILE, JWT_KEY_FILE, DECRYPTION_KEY, and DECRYPTION_IV.'
+            exit 1
+          fi
+          umask 077
+          openssl enc -nosalt -aes-256-cbc -d -in "${{ secrets.ENCRYPTION_KEY_FILE }}" -out "${{ secrets.JWT_KEY_FILE }}" -base64 -K "${{ secrets.DECRYPTION_KEY }}" -iv "${{ secrets.DECRYPTION_IV }}"
 
       - name: "Authenticate with Salesforce"
+        env:
+          HUB_LOGIN_URL: ${{ vars.HUB_LOGIN_URL }}
         run: |
-          sf org login jwt --client-id ${{ secrets.CONSUMER_KEY }} \
-            --jwt-key-file ${{ secrets.JWT_KEY_FILE }} \
-            --username ${{ secrets.DEPLOYMENT_USER_USERNAME }} \
-            --set-default --alias ${{ vars.ORG_DEFAULT_ALIAS }} \
-            --instance-url ${{ vars.HUB_LOGIN_URL }}
+          sf org login jwt --client-id "${{ secrets.CONSUMER_KEY }}" \
+            --jwt-key-file "${{ secrets.JWT_KEY_FILE }}" \
+            --username "${{ secrets.DEPLOYMENT_USER_USERNAME }}" \
+            --set-default --alias "$ORG_ALIAS" \
+            --instance-url "$HUB_LOGIN_URL"
 
       
 
