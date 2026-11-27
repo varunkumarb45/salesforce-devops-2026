@@ -1,4 +1,4 @@
-name: Salesforce CI Pipeline
+name: Salesforce CI Pipeline.
 run-name: "Salesforce Pipeline"
 
 on:
