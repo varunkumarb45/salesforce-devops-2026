@@ -10,8 +10,7 @@ on:
       - feature/**
   pull_request:
     types: [opened, synchronize, reopened]
-    paths:
-      - 'force-app/**'
+    
     branches:
       - uat
       
